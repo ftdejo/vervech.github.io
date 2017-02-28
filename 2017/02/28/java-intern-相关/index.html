@@ -89,15 +89,25 @@
 
 
 
-<meta name="description" content="Why so serious?">
-<meta property="og:type" content="website">
-<meta property="og:title" content="陈六的博客">
-<meta property="og:url" content="https://ftdejo.github.io/index.html">
+<meta name="description" content="java String中intern()方法相关
+intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。
+
+Talk is cheap show me the">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java intern()相关">
+<meta property="og:url" content="https://ftdejo.github.io/2017/02/28/java-intern-相关/index.html">
 <meta property="og:site_name" content="陈六的博客">
-<meta property="og:description" content="Why so serious?">
+<meta property="og:description" content="java String中intern()方法相关
+intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。
+
+Talk is cheap show me the">
+<meta property="og:updated_time" content="2017-02-28T08:23:03.125Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="陈六的博客">
-<meta name="twitter:description" content="Why so serious?">
+<meta name="twitter:title" content="java intern()相关">
+<meta name="twitter:description" content="java String中intern()方法相关
+intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。
+
+Talk is cheap show me the">
 
 
 
@@ -125,13 +135,13 @@
 
 
 
-  <link rel="canonical" href="https://ftdejo.github.io/"/>
+  <link rel="canonical" href="https://ftdejo.github.io/2017/02/28/java-intern-相关/"/>
 
 
 
 
 
-  <title> 陈六的博客 </title>
+  <title> java intern()相关 | 陈六的博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -156,9 +166,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left 
-   page-home 
- ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -239,9 +247,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -274,10 +282,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/2017/02/28/java-intern-相关/" itemprop="url">
-                  java intern()相关
-                </a>
+                java intern()相关
               
             
           </h1>
@@ -338,9 +343,7 @@
       
 
       
-        
-          
-            <h2 id="java-String中intern-方法相关"><a href="#java-String中intern-方法相关" class="headerlink" title="java String中intern()方法相关"></a>java String中intern()方法相关</h2><blockquote>
+        <h2 id="java-String中intern-方法相关"><a href="#java-String中intern-方法相关" class="headerlink" title="java String中intern()方法相关"></a>java String中intern()方法相关</h2><blockquote>
 <p>intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。</p>
 </blockquote>
 <p><del>Talk is cheap show me the code</del></p>
@@ -362,16 +365,20 @@
 <p>#6 常量池中没有”计算机软件”这个字符串，所以会在常量池中生成一个对堆中的”计算机软件”的引用，而在进行字面量赋值的时候，常量池中已经存在，所以直接返回该引用即可，因此str1和str2都指向堆中的字符串，返回true</p>
 <p>#7 常量池中存在”java”字符串..至于为什么存在，不要在意这些细节..，所以str2.intern()会返回常量池中引用，返回false</p>
 
-          
+      
+    </div>
+
+    <div>
+      
         
+
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
@@ -380,21 +387,22 @@
       
 
       
-
+        
       
 
       
+
       
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
           
           </div>
@@ -402,6 +410,14 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/02/28/java-intern-相关/"
+           data-title="java intern()相关" data-url="https://ftdejo.github.io/2017/02/28/java-intern-相关/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -421,8 +437,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/images/avatar.jpg"
@@ -471,6 +496,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#java-String中intern-方法相关"><span class="nav-number">1.</span> <span class="nav-text">java String中intern()方法相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#step1"><span class="nav-number">1.1.</span> <span class="nav-text">step1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step2"><span class="nav-number">1.2.</span> <span class="nav-text">step2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step3"><span class="nav-number">1.3.</span> <span class="nav-text">step3</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
     </div>
@@ -570,6 +611,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
 
   
 

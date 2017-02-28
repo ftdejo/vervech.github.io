@@ -4,9 +4,9 @@
   <subtitle>memo for code or game.</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
-  <updated>2017-02-18T07:33:49.085Z</updated>
-  <id>http://yoursite.com/</id>
+  <link href="https://ftdejo.github.io/"/>
+  <updated>2017-02-28T08:23:03.125Z</updated>
+  <id>https://ftdejo.github.io/</id>
   
   <author>
     <name>陈六</name>
@@ -16,69 +16,38 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>article title</title>
-    <link href="http://yoursite.com/2017/02/13/article-title/"/>
-    <id>http://yoursite.com/2017/02/13/article-title/</id>
-    <published>2017-02-13T10:37:37.000Z</published>
-    <updated>2017-02-18T07:33:49.085Z</updated>
+    <title>java intern()相关</title>
+    <link href="https://ftdejo.github.io/2017/02/28/java-intern-%E7%9B%B8%E5%85%B3/"/>
+    <id>https://ftdejo.github.io/2017/02/28/java-intern-相关/</id>
+    <published>2017-02-28T08:21:28.000Z</published>
+    <updated>2017-02-28T08:23:03.125Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="初识MarkDown"><a href="#初识MarkDown" class="headerlink" title="初识MarkDown"></a>初识MarkDown</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">graph LR</div><div class="line">A--&gt;B</div></pre></td></tr></table></figure>
-<hr>
-<p>水叔叔<br>换行了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public static void toActivity(Context context, Class&lt;?&gt; mClass) &#123;</div><div class="line">    Intent intent = new Intent(context, mClass);</div><div class="line">    context.startActivity(intent);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>A single backtick in a code span: <code>` </code></p>
-<p>A backtick-delimited string in a code span: <code>`foo` </code></p>
-<h1 id="初识2"><a href="#初识2" class="headerlink" title="初识2"></a>初识2</h1><h2 id="我是二级标题"><a href="#我是二级标题" class="headerlink" title="我是二级标题"></a>我是二级标题</h2><h3 id="我是三级标题"><a href="#我是三级标题" class="headerlink" title="我是三级标题"></a>我是三级标题</h3><h4 id="我是四级标题"><a href="#我是四级标题" class="headerlink" title="我是四级标题"></a>我是四级标题</h4><h5 id="我是五极标题"><a href="#我是五极标题" class="headerlink" title="我是五极标题"></a>我是五极标题</h5><h6 id="我是六级标题"><a href="#我是六级标题" class="headerlink" title="我是六级标题"></a>我是六级标题</h6><ul>
-<li>多标签列表</li>
-<li>多标签列表</li>
-<li>多标签列表</li>
-</ul>
-<ol>
-<li>有序列表</li>
-<li>有序列表</li>
-<li>有序列表</li>
-</ol>
-<ul>
-<li>[ ] 试一哈</li>
-<li>[x] 完成了</li>
-<li></li>
-</ul>
-<hr>
-<p>跑了</p>
-<blockquote>
-<p>引用？</p>
+    <content type="html"><![CDATA[<h2 id="java-String中intern-方法相关"><a href="#java-String中intern-方法相关" class="headerlink" title="java String中intern()方法相关"></a>java String中intern()方法相关</h2><blockquote>
+<p>intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。</p>
 </blockquote>
+<p><del>Talk is cheap show me the code</del></p>
+<h3 id="step1"><a href="#step1" class="headerlink" title="step1"></a>step1</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String str1= &quot;aa&quot;;</div><div class="line">String str2 = new String(&quot;bb&quot;);</div><div class="line">System.out.println(&quot;******&quot;);</div><div class="line">System.out.println(str1.intern() == str1); //#1</div><div class="line">System.out.println(str2.intern() == str2); //#2</div></pre></td></tr></table></figure>
+<blockquote>
+<p>通过字面量赋值创建字符串时，会优先在常量池中查找是否已经存在相同的字符串，倘若已经存在，栈中的引用直接指向该字符串；倘若不存在，则在常量池中生成一个字符串，再将栈中的引用指向该字符串。而通过new的方式创建字符串时，就直接在堆中生成一个字符串的对象。</p>
+</blockquote>
+<p>#1：因为str1指向的是常量池中的引用，调用intern()方法返回同一个引用，所以返回true。</p>
+<p>#2：str2创建的字符串实例在java堆上，调用intern()方法必然不是同一个引用，所以返回false</p>
+<h3 id="step2"><a href="#step2" class="headerlink" title="step2"></a>step2</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">String baseStr = &quot;ccdd&quot;;</div><div class="line">final String baseFinalStr = &quot;ccdd&quot;;</div><div class="line"> </div><div class="line">String str1 = &quot;ccdd&quot;;</div><div class="line">String str2 = &quot;cc&quot;+&quot;dd&quot;;</div><div class="line">String str3 = baseStr + &quot;dd&quot;;</div><div class="line">String str4 = baseFinalStr+&quot;dd&quot;;</div><div class="line"> </div><div class="line">System.out.println(str1 == str2);//#3</div><div class="line">System.out.println(str1 == str3);//#4</div><div class="line">System.out.println(str1 == str4);//#5</div></pre></td></tr></table></figure>
+<p>#3：常量字符串的”+”操作，编译阶段直接作为一个字符串处理，所以返回true</p>
+<p>#4：字符串引用的”+”操作，其实是StringBuilder.append()操作，而由StringBuilder创建的字符串实例在Java堆上，所以返回false</p>
+<p>#5：对于final修饰符，编译期直接进行了常量替换，而对于非final字段则是在运行期进行赋值处理的，所以str4相当于常量字符串，返回true</p>
+<h3 id="step3"><a href="#step3" class="headerlink" title="step3"></a>step3</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String str1=new StringBuilder(&quot;计算机&quot;).append(&quot;软件&quot;).toString();</div><div class="line">String str2=new StringBuilder(&quot;ja&quot;).append(&quot;va&quot;).toString();</div><div class="line"></div><div class="line">System.out.println(str1.intern()==str1);  // #6</div><div class="line">System.out.println(str2.intern()==str2);  // #7</div></pre></td></tr></table></figure>
+<p><strong>对于这段代码，在 JDK 1.6 和 JDK 1.7中的运行结果不同。<br>这段代码在JKD1.6中运行，会得到2个false。在JDK1.7中的运行结果却是true和false！</strong></p>
+<blockquote>
+<p>这个原因主要是从JDK 1.7后，HotSpot 将常量池从永久代移到了元空间，正因为如此，JDK 1.7后的intern方法在实现上发生了比较大的改变，JDK 1.7后(以及部分其他虚拟机，例如JRockit)，intern方法还是会先去查询常量池中是否有已经存在，如果存在，则返回常量池中的引用，这一点与之前没有区别，区别在于，如果在常量池找不到对应的字符串，则不会再将字符串拷贝到常量池，而只是在常量池中记录首次出现的实例引用。</p>
+</blockquote>
+<p>#6 常量池中没有”计算机软件”这个字符串，所以会在常量池中生成一个对堆中的”计算机软件”的引用，而在进行字面量赋值的时候，常量池中已经存在，所以直接返回该引用即可，因此str1和str2都指向堆中的字符串，返回true</p>
+<p>#7 常量池中存在”java”字符串..至于为什么存在，不要在意这些细节..，所以str2.intern()会返回常量池中引用，返回false</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;h1 id=&quot;初识MarkDown&quot;&gt;&lt;a href=&quot;#初识MarkDown&quot; class=&quot;headerlink&quot; title=&quot;初识MarkDown&quot;&gt;&lt;/a&gt;初识MarkDown&lt;/h1&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;t
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="http://yoursite.com/2017/02/13/hello-world/"/>
-    <id>http://yoursite.com/2017/02/13/hello-world/</id>
-    <published>2017-02-13T10:09:19.933Z</published>
-    <updated>2017-02-13T10:09:19.941Z</updated>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
+      &lt;h2 id=&quot;java-String中intern-方法相关&quot;&gt;&lt;a href=&quot;#java-String中intern-方法相关&quot; class=&quot;headerlink&quot; title=&quot;java String中intern()方法相关&quot;&gt;&lt;/a&gt;java String中inte
     
     </summary>
     
