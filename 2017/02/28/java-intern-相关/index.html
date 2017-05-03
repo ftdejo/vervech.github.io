@@ -89,25 +89,16 @@
 
 
 
-<meta name="description" content="java String中intern()方法相关
-intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。
-
-Talk is cheap show me the">
+<meta name="description" content="intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java intern()相关">
 <meta property="og:url" content="https://ftdejo.github.io/2017/02/28/java-intern-相关/index.html">
 <meta property="og:site_name" content="陈六的博客">
-<meta property="og:description" content="java String中intern()方法相关
-intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。
-
-Talk is cheap show me the">
-<meta property="og:updated_time" content="2017-04-24T03:33:36.753Z">
+<meta property="og:description" content="intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。">
+<meta property="og:updated_time" content="2017-05-03T08:32:19.199Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java intern()相关">
-<meta name="twitter:description" content="java String中intern()方法相关
-intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。
-
-Talk is cheap show me the">
+<meta name="twitter:description" content="intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。">
 
 
 
@@ -493,9 +484,10 @@ Talk is cheap show me the">
       
 
       
-        <h2 id="java-String中intern-方法相关"><a href="#java-String中intern-方法相关" class="headerlink" title="java String中intern()方法相关"></a>java String中intern()方法相关</h2><blockquote>
+        <blockquote>
 <p>intern 这个方法返回的是返回字符串对象的规范化表示形式，当调用 intern 方法时，如果常量池已经包含一个等于此String 对象的字符串(该对象由equals(Object) 方法确定)，则返回池中的字符串。否则，将此String对象添加到池中，并且返回此 String 对象的引用。</p>
 </blockquote>
+<a id="more"></a>
 <p><del>Talk is cheap show me the code</del></p>
 <h3 id="step1"><a href="#step1" class="headerlink" title="step1"></a>step1</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String str1= &quot;aa&quot;;</div><div class="line">String str2 = new String(&quot;bb&quot;);</div><div class="line">System.out.println(&quot;******&quot;);</div><div class="line">System.out.println(str1.intern() == str1); //#1</div><div class="line">System.out.println(str2.intern() == str2); //#2</div></pre></td></tr></table></figure>
 <blockquote>
@@ -685,7 +677,7 @@ Talk is cheap show me the">
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#java-String中intern-方法相关"><span class="nav-number">1.</span> <span class="nav-text">java String中intern()方法相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#step1"><span class="nav-number">1.1.</span> <span class="nav-text">step1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step2"><span class="nav-number">1.2.</span> <span class="nav-text">step2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step3"><span class="nav-number">1.3.</span> <span class="nav-text">step3</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#step1"><span class="nav-number">1.</span> <span class="nav-text">step1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step2"><span class="nav-number">2.</span> <span class="nav-text">step2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step3"><span class="nav-number">3.</span> <span class="nav-text">step3</span></a></li></ol></div>
             
 
           </div>

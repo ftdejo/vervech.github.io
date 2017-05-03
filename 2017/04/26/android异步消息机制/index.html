@@ -89,26 +89,17 @@
 
 
 
-<meta name="description" content="之前一直被多线程和UI更新的问题所困扰，于是网上查阅以及翻看了相关源码，这篇文章用来记录异步消息机制，之后还会有一篇多线程相关的，恩，一定会有的。
-
-新手在写android的过程中，都可能遇到以下的错误:
-android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created">
+<meta name="description" content="之前一直被多线程和UI更新的问题所困扰，于是网上查阅以及翻看了相关源码，这篇文章用来记录异步消息机制，之后还会有一篇多线程相关的，恩，一定会有的。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="android异步消息机制">
 <meta property="og:url" content="https://ftdejo.github.io/2017/04/26/android异步消息机制/index.html">
 <meta property="og:site_name" content="陈六的博客">
-<meta property="og:description" content="之前一直被多线程和UI更新的问题所困扰，于是网上查阅以及翻看了相关源码，这篇文章用来记录异步消息机制，之后还会有一篇多线程相关的，恩，一定会有的。
-
-新手在写android的过程中，都可能遇到以下的错误:
-android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created">
+<meta property="og:description" content="之前一直被多线程和UI更新的问题所困扰，于是网上查阅以及翻看了相关源码，这篇文章用来记录异步消息机制，之后还会有一篇多线程相关的，恩，一定会有的。">
 <meta property="og:image" content="http://pic002.cnblogs.com/images/2011/315542/2011091323582123.png">
-<meta property="og:updated_time" content="2017-05-03T08:25:03.080Z">
+<meta property="og:updated_time" content="2017-05-03T08:32:00.821Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android异步消息机制">
-<meta name="twitter:description" content="之前一直被多线程和UI更新的问题所困扰，于是网上查阅以及翻看了相关源码，这篇文章用来记录异步消息机制，之后还会有一篇多线程相关的，恩，一定会有的。
-
-新手在写android的过程中，都可能遇到以下的错误:
-android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created">
+<meta name="twitter:description" content="之前一直被多线程和UI更新的问题所困扰，于是网上查阅以及翻看了相关源码，这篇文章用来记录异步消息机制，之后还会有一篇多线程相关的，恩，一定会有的。">
 <meta name="twitter:image" content="http://pic002.cnblogs.com/images/2011/315542/2011091323582123.png">
 
 
@@ -498,6 +489,7 @@ android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thre
         <blockquote>
 <p>之前一直被多线程和UI更新的问题所困扰，于是网上查阅以及翻看了相关源码，这篇文章用来记录异步消息机制，之后还会有一篇多线程相关的，恩，一定会有的。</p>
 </blockquote>
+<a id="more"></a>
 <p>新手在写android的过程中，都可能遇到以下的错误:</p>
 <p>android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.</p>
 <p>然后查阅了一番以后发现，哦，原来是子线程不能更新UI，然后用随便搜到的方法做解决（没错这个人就是我）</p>
