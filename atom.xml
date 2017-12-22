@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://ftdejo.github.io/"/>
-  <updated>2017-06-16T06:42:06.704Z</updated>
+  <updated>2017-12-22T08:50:53.798Z</updated>
   <id>https://ftdejo.github.io/</id>
   
   <author>
@@ -14,6 +14,108 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>搜索旋转排序数组</title>
+    <link href="https://ftdejo.github.io/2017/12/21/%E6%90%9C%E7%B4%A2%E6%97%8B%E8%BD%AC%E6%8E%92%E5%BA%8F%E6%95%B0%E7%BB%84/"/>
+    <id>https://ftdejo.github.io/2017/12/21/搜索旋转排序数组/</id>
+    <published>2017-12-21T02:29:15.000Z</published>
+    <updated>2017-12-22T08:50:53.798Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="问题"><a href="#问题" class="headerlink" title="问题:"></a>问题:</h3><blockquote>
+<p>leetcode: Problem #33</p>
+<p><strong>Search in Rotated Sorted Array</strong></p>
+<p>Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.</p>
+<p>(i.e., <code>0 1 2 4 5 6 7</code> might become <code>4 5 6 7 0 1 2</code>).</p>
+<p>You are given a target value to search. If found in the array return its index, otherwise return -1.</p>
+<p>You may assume no duplicate exists in the array.</p>
+</blockquote>
+<a id="more"></a>
+<p>题目大意就是把一组排序数组从头开始的一段数(可能是0,1..)移到数组最后，然后再进行查找。</p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析:"></a>分析:</h3><p>读题：整个数组还是”有序”的</p>
+<p>猜想：用二分查找 应该可以O(logN)时间内完成。</p>
+<p>关键是怎么在每次比较以后，确定上下限的位置，和平时的二分法是有区别的。</p>
+<p><del>下面是回顾普通二分法时间，不想看的可以直接往下拉</del></p>
+<p>首先，普通的二分法是这样的：</p>
+<p>确定p（数组最小），q（数组最大），mid（数组中间位置）</p>
+<p><img src="普通二分" alt="figure_1.png"></p>
+<p>(真实情况不是连续函数，这里只是为了说明算法)</p>
+<p>当p 在 q左边时，进行循环:</p>
+<p>当我们要查找一个数(target)的时候，比较target与array[mid]，有3种可能性：</p>
+<ol>
+<li><p><span id="jumpl"></span>target &lt; array[mid]</p>
+<p>目标值小于中值，所以我们要将整个查找范围<strong>左移</strong>，然后继续循环，即：</p>
+<p><img src="左移" alt="figure_2.png"></p>
+</li>
+<li><p><span id="jumpr"></span>target &gt; array[mid]</p>
+<p>目标值大于中值，<strong>右移</strong>，然后继续循环，即：</p>
+<p><img src="右移" alt="figure_3.png"></p>
+</li>
+<li><p>target = array[mid]</p>
+<p>找到目标值，退出循环</p>
+</li>
+</ol>
+<p>循环如果结束，代表未找到，返回-1。</p>
+<p>而在这道题中，数组不一定”完全”有序,也就是除了普通情况（此时数组未移动） 会再出现两种情况。</p>
+<ul>
+<li><p>case 1:</p>
+<p> mid的右边数组为递增，而左边数组不再是单调递增。</p>
+<p><img src="case 1" alt="figure_4.png"></p>
+<p>​</p>
+</li>
+</ul>
+<ul>
+<li><p>case 2:</p>
+<p>mid的左边数组为递增，而右边数组不再是单调递增。</p>
+<p><img src="case 2" alt="figure_5.png"></p>
+</li>
+<li><p>case N:普通情况，即正常数组，此处不再复述。</p>
+</li>
+</ul>
+<p>可以看出，比mid小的数，不一定在mid左边(case 1)，比mid大的数，不一定在mid右边(case 2))。但是，由于mid的两边，总有一边会保持单调性，所以只需判断是哪种情况，再进行我们的<a href="#jumpl">左移</a>或者<a href="#jumpr">右移</a>操作就可以继续循环了。</p>
+<h3 id="解"><a href="#解" class="headerlink" title="解:"></a>解:</h3><p>前面步骤与普通二分法相同，关键在于判断target 与 array[mid]时，如果:</p>
+<ol>
+<li><p>target &lt; array[mid]</p>
+<p>直觉告诉我们应该是左移，那么就找出满足什么条件时，target在mid左边。</p>
+<p>case N: target 一定在mid左边。</p>
+<p>case 1: 我们发现target也一定在mid左边，此时与case N相同。</p>
+<p>即mid右边单调递增(array[mid] &lt;= array[q])时，target一定在mid左边；</p>
+<p>case 2: target要想在mid左边，必须满足(target &gt;= array[p])，反之亦然。其实可以看出(target &gt;= array[p] )依然包括了case N。</p>
+<p>其余情况，target在mid右边。</p>
+</li>
+<li><p>target &gt; array[mid]</p>
+<p>找出右移的条件：</p>
+<p>如果是case N || case 2,即mid左边单调递增(array[mid] &gt;= array[p])，target 一定在mid右边。</p>
+<p>如果是case 1，target要想在mid右边，必须满足(target &lt;= array[q])，反之亦然。</p>
+<p>其余情况，target在mid右边。</p>
+</li>
+<li><p>target = array[mid]</p>
+</li>
+</ol>
+<p>​        找到目标值，循环结束。</p>
+<p>循环如果结束，代表未找到，返回-1。</p>
+<h3 id="Code"><a href="#Code" class="headerlink" title="Code:"></a>Code:</h3><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">int search(vector&lt;int&gt;&amp; nums, int target) &#123;</div><div class="line">	if(nums.empty())</div><div class="line">        return -1;</div><div class="line">    int p(0),q(nums.size() - 1);</div><div class="line">    while(p &lt;= q)&#123;</div><div class="line">        int mid = (p + q) / 2;</div><div class="line">        if(target &lt; nums[mid])&#123;</div><div class="line">            if(nums[mid] &lt;= nums[q] || target &gt;= nums[p])</div><div class="line">                q = mid - 1;</div><div class="line">            else</div><div class="line">                p = mid + 1;</div><div class="line">        &#125;   </div><div class="line">        else if(target &gt; nums[mid])&#123;</div><div class="line">            if(nums[mid] &gt;= nums[p] || target &lt;= nums[q])</div><div class="line">                p = mid + 1;</div><div class="line">            else</div><div class="line">                q = mid - 1;</div><div class="line">        &#125;</div><div class="line">        else </div><div class="line">            return mid;</div><div class="line">    &#125;</div><div class="line">    return -1;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题:&quot;&gt;&lt;/a&gt;问题:&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;leetcode: Problem #33&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Search in Rotated Sorted Array&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.&lt;/p&gt;
+&lt;p&gt;(i.e., &lt;code&gt;0 1 2 4 5 6 7&lt;/code&gt; might become &lt;code&gt;4 5 6 7 0 1 2&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;You are given a target value to search. If found in the array return its index, otherwise return -1.&lt;/p&gt;
+&lt;p&gt;You may assume no duplicate exists in the array.&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="算法" scheme="https://ftdejo.github.io/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="leetcode" scheme="https://ftdejo.github.io/tags/leetcode/"/>
+    
+  </entry>
   
   <entry>
     <title>真正的起点</title>
