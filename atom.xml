@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://ftdejo.github.io/"/>
-  <updated>2017-12-22T08:50:53.798Z</updated>
+  <updated>2017-12-22T08:57:23.420Z</updated>
   <id>https://ftdejo.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://ftdejo.github.io/2017/12/21/%E6%90%9C%E7%B4%A2%E6%97%8B%E8%BD%AC%E6%8E%92%E5%BA%8F%E6%95%B0%E7%BB%84/"/>
     <id>https://ftdejo.github.io/2017/12/21/搜索旋转排序数组/</id>
     <published>2017-12-21T02:29:15.000Z</published>
-    <updated>2017-12-22T08:50:53.798Z</updated>
+    <updated>2017-12-22T08:57:23.420Z</updated>
     
     <content type="html"><![CDATA[<h3 id="问题"><a href="#问题" class="headerlink" title="问题:"></a>问题:</h3><blockquote>
 <p>leetcode: Problem #33</p>
@@ -38,18 +38,18 @@
 <p><del>下面是回顾普通二分法时间，不想看的可以直接往下拉</del></p>
 <p>首先，普通的二分法是这样的：</p>
 <p>确定p（数组最小），q（数组最大），mid（数组中间位置）</p>
-<p><img src="普通二分" alt="figure_1.png"></p>
+<p><img src="figure_1.png" alt="普通二分"></p>
 <p>(真实情况不是连续函数，这里只是为了说明算法)</p>
 <p>当p 在 q左边时，进行循环:</p>
 <p>当我们要查找一个数(target)的时候，比较target与array[mid]，有3种可能性：</p>
 <ol>
 <li><p><span id="jumpl"></span>target &lt; array[mid]</p>
 <p>目标值小于中值，所以我们要将整个查找范围<strong>左移</strong>，然后继续循环，即：</p>
-<p><img src="左移" alt="figure_2.png"></p>
+<p><img src="figure_2.png" alt="左移"></p>
 </li>
 <li><p><span id="jumpr"></span>target &gt; array[mid]</p>
 <p>目标值大于中值，<strong>右移</strong>，然后继续循环，即：</p>
-<p><img src="右移" alt="figure_3.png"></p>
+<p><img src="figure_3.png" alt="右移"></p>
 </li>
 <li><p>target = array[mid]</p>
 <p>找到目标值，退出循环</p>
@@ -60,14 +60,14 @@
 <ul>
 <li><p>case 1:</p>
 <p> mid的右边数组为递增，而左边数组不再是单调递增。</p>
-<p><img src="case 1" alt="figure_4.png"></p>
+<p><img src="figure_4.png" alt="case 1"></p>
 <p>​</p>
 </li>
 </ul>
 <ul>
 <li><p>case 2:</p>
 <p>mid的左边数组为递增，而右边数组不再是单调递增。</p>
-<p><img src="case 2" alt="figure_5.png"></p>
+<p><img src="figure_5.png" alt="case 2"></p>
 </li>
 <li><p>case N:普通情况，即正常数组，此处不再复述。</p>
 </li>
