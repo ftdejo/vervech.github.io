@@ -227,9 +227,9 @@
     <link href="https://ftdejo.github.io/2017/11/21/c-4%E7%A7%8D%E8%BD%AC%E6%8D%A2/"/>
     <id>https://ftdejo.github.io/2017/11/21/c-4种转换/</id>
     <published>2017-11-21T03:12:57.000Z</published>
-    <updated>2018-03-21T04:08:43.558Z</updated>
+    <updated>2018-03-21T04:24:03.041Z</updated>
     
-    <content type="html"><![CDATA[<p>c++相对于c，对于类型转换管理更加方便了，因为提供了4个关键字来管理显示的类型转换：</p>
+    <content type="html"><![CDATA[<p>c++相对于c，对于类型转换管理更加方便了，因为提供了4个转换操作符来管理显示的类型转换：</p>
 <p>static_cast, dynamic_cast,const_cast, reinterpret_cast.</p>
 <p>下面写写对4种转换的理解</p>
 <a id="more"></a>
@@ -256,7 +256,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;c++相对于c，对于类型转换管理更加方便了，因为提供了4个关键字来管理显示的类型转换：&lt;/p&gt;
+      &lt;p&gt;c++相对于c，对于类型转换管理更加方便了，因为提供了4个转换操作符来管理显示的类型转换：&lt;/p&gt;
 &lt;p&gt;static_cast, dynamic_cast,const_cast, reinterpret_cast.&lt;/p&gt;
 &lt;p&gt;下面写写对4种转换的理解&lt;/p&gt;
     
