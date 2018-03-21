@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://ftdejo.github.io/"/>
-  <updated>2018-01-25T11:08:09.088Z</updated>
+  <updated>2018-03-21T12:15:29.906Z</updated>
   <id>https://ftdejo.github.io/</id>
   
   <author>
@@ -14,6 +14,107 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>C++虚函数相关</title>
+    <link href="https://ftdejo.github.io/2018/02/21/c-%E8%99%9A%E5%87%BD%E6%95%B0%E7%9B%B8%E5%85%B3/"/>
+    <id>https://ftdejo.github.io/2018/02/21/c-虚函数相关/</id>
+    <published>2018-02-21T04:33:56.000Z</published>
+    <updated>2018-03-21T12:15:29.906Z</updated>
+    
+    <content type="html"><![CDATA[<p>   ​c++虚表指针及虚表是实现多态的关键，因此有必要了解下实现方法。</p>
+<h3 id=""><a href="#" class="headerlink" title=""></a><a id="more"></a></h3><p>(本文运行环境为VS2017 编译器MSVC)</p>
+<p>在Visual Studio里，可以利用reportAllClassLayout查看内存。具体实现如下：</p>
+<p><img src="pic2.png" alt=""><br><img src="pic1.png" alt=""></p>
+<h3 id="普通类"><a href="#普通类" class="headerlink" title="普通类:"></a>普通类:</h3><p>接下来就可以愉快的敲代码了，首先定义一个类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> a;</div><div class="line">    <span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Function</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>然后编译，可以看到有如下的排布：</p>
+<p><img src="pic3.png" alt=""></p>
+<p>因为这里要去除内存对齐的因素，所以我都用了int型，从这里可以看到普通类的排布方式，成员变量依据声明的顺序进行排列（类内偏移为0开始），成员函数不占内存空间。</p>
+<h3 id="继承类"><a href="#继承类" class="headerlink" title="继承类:"></a>继承类:</h3><p>然后定义一个继承类</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> DerivedClass: <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">DerivedFunction</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>然后编译下：</p>
+<p><img src="pic4.png" alt=""></p>
+<p>可以看到子类继承了父类的成员变量，在内存排布上，先是排布了父类的成员变量，接着排布子类的成员变量，同样，成员函数不占字节。</p>
+<h3 id="虚函数-无覆盖-一般继承"><a href="#虚函数-无覆盖-一般继承" class="headerlink" title="虚函数(无覆盖 一般继承):"></a>虚函数(无覆盖 一般继承):</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Function</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> DerivedClass : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction1</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这里我加上了一个虚函数，先看下基类内存分布：</p>
+<p><img src="pic5.png" alt=""></p>
+<p>这个内存结构图分成了两个部分，上面是内存分布，下面是虚表，我们逐个看。MSVC是把虚表指针放在了内存的开始处（0地址偏移），然后再是成员变量；下面生成了虚表，紧跟在&amp;Base_meta后面的0表示，这张虚表对应的虚指针在内存中的分布，下面列出了虚函数，左侧的0是这个虚函数的序号，这里只有一个虚函数，所以只有一项，如果有多个虚函数，会有序号为1，为2的虚函数列出来。注意这里的只是虚表里面增加，虚函数指针只有一个。</p>
+<p>然后我给子类加上了个额外的虚函数，但是没有覆盖父类的。再来看子类内存排布：</p>
+<p><img src="pic6.png" alt=""></p>
+<p>上半部是内存分布，可以看到，虚表指针被继承了，且仍位于内存排布的起始处，下面是父类的成员变量a和b，最后是子类的成员变量c，注意虚表指针只有一个，子类并没有再生成虚表指针了。从以上内存分布，可以看出：</p>
+<ol>
+<li>虚函数按照其声明顺序放于表中。</li>
+<li>父类的虚函数在子类的虚函数前面。</li>
+</ol>
+<h3 id="虚函数-覆盖-一般继承"><a href="#虚函数-覆盖-一般继承" class="headerlink" title="虚函数(覆盖 一般继承):"></a>虚函数(覆盖 一般继承):</h3><p>如果不覆盖，那么我们多态就无从谈起，于是这里我修改了下子类代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Function</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction2</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> DerivedClass : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction3</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>重新编译程序，可以看到以下内存分布:</p>
+<p><img src="pic7.png" alt=""></p>
+<p>可以发现，Base::VirtualFunction在虚表中不见了，那么总结出：</p>
+<ol>
+<li>覆盖的f()函数被放到了虚表中原来父类虚函数的位置。</li>
+<li>没有被覆盖的函数依旧。</li>
+</ol>
+<h3 id="多态"><a href="#多态" class="headerlink" title="多态!"></a>多态!</h3><p>那么编译器是如何利用虚表指针与虚表来实现多态的呢？是这样的，当创建一个含有虚函数的父类的对象时，编译器在对象构造时将虚表指针指向父类的虚函数；同样，当创建子类的对象时，编译器在构造函数里将虚表指针（子类只有一个虚表指针，它来自父类）指向子类的虚表（这个虚表里面的虚函数入口地址是子类的）。</p>
+<p>所以，对于这样一段代码<code>Base *p = new Derived()</code>:</p>
+<p>生成的是子类的对象，在构造时，子类对象的虚指针指向的是子类的虚表，接着由<code>Derived*</code>到<code>Base*</code>的转换并没有改变虚表指针，所以这时候<code>p-&gt;VirtualFunction</code>， 由p所指的内存中的虚函数表的<code>VirtualFunction()</code>的位置已经被<code>Derive::VirtualFunction()</code>函数地址所取代，于是在实际调用发生时，是<code>Derive::VirtualFunction()</code>被调用了。这就实现了多态。</p>
+<h3 id="多重继承-无覆盖"><a href="#多重继承-无覆盖" class="headerlink" title="多重继承(无覆盖)"></a>多重继承(无覆盖)</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">CommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass1 : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f1</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass2 : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> d;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f2</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedDerivedClass : <span class="keyword">public</span> DerivedClass1, <span class="keyword">public</span> DerivedClass2</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> e;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedDerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f3</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>内存分布图(前三个省略)：</p>
+<p><img src="pic8.png" alt=""></p>
+<p>下面我们重点看看这个类DerivedDerivedClass，由外向内看，它并列地排布着继承而来的两个父类DerivedClass1与DerivedClass2，还有自身的成员变量e。DerivedClass1包含了它的成员变量c，以及Base，Base有一个0地址偏移的虚表指针，然后是成员变量a和b；DerivedClass2的内存排布类似于DerivedClass1，偏移量为16(即，注意到DerivedClass2里面竟然也有一份Base。</p>
+<p>可以看到:</p>
+<ol>
+<li>每个父类都有自己的虚表</li>
+<li>存了2个虚表指针，来指向不同的父类虚表</li>
+<li>子类的虚函数被放到了第一个父类的表中。（所谓的第一个父类是按照声明顺序来判断的）</li>
+</ol>
+<p>这样做就是为了解决不同的父类类型的指针指向同一个子类实例，而能够调用到实际的函数。</p>
+<h3 id="多重继承-有覆盖"><a href="#多重继承-有覆盖" class="headerlink" title="多重继承(有覆盖)"></a>多重继承(有覆盖)</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">CommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">g</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass1 : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">g1</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass2 : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> d;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">g2</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedDerivedClass : <span class="keyword">public</span> DerivedClass1, <span class="keyword">public</span> DerivedClass2</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> e;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedDerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">g3</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p><img src="pic85.png" alt=""></p>
+<p><img src="pic9.png" alt=""></p>
+<p>我们可以看见，<strong>两个</strong>父类虚函数表中的f()的位置被替换成了子类的函数指针。这样，我们就可以任一静态类型的父类来指向子类，并调用子类的f()了。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">DerivedDerivedClass d;</div><div class="line">DerivedClass1 *b2 = &amp;d;</div><div class="line">DerivedClass2 *b3 = &amp;d;</div><div class="line">b2-&gt;f(); <span class="comment">//DerivedDerivedClass::f()</span></div><div class="line">b3-&gt;f(); <span class="comment">//DerivedDerivedClass::f()</span></div></pre></td></tr></table></figure>
+<h3 id="虚继承"><a href="#虚继承" class="headerlink" title="虚继承"></a>虚继承</h3><p>不知道看官注意到了没，在上文中，我没有写<code>Base b = &amp;d; b-&gt;f();</code></p>
+<p>这样的代码为什么出问题，如果是从上文阅读过来，我想这个问题一定难不倒你:)</p>
+<p>关键是怎么解决呢？那么可以利用虚继承的概念。</p>
+<blockquote>
+<p>在虚继承下，对给定虚基类，无论该类在派生层次中作为虚基类出现多少次，只继承一个共享的基类子对象。共享的基类子对象称为虚基类。   <em>《c++ primer》</em>                           </p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">CommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass1 : <span class="keyword">public</span> <span class="keyword">virtual</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass2 : <span class="keyword">public</span> <span class="keyword">virtual</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> d;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedDerivedClass : <span class="keyword">public</span> DerivedClass1, <span class="keyword">public</span> DerivedClass2</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> e;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedDerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>编译上述代码：</p>
+<p><img src="v1.png" alt=""></p>
+<p>Base没有变化。但是只要我们往下，就会发现很多不同的东西：</p>
+<p><img src="v2.png" alt=""></p>
+<p>DerivedClass1就已经有变化了，原来是先排虚表指针与Base成员变量，vfptr位于0地址偏移处；但现在有两个虚表指针了，一个是vbptr，另一个是vfptr。vbptr是这个DerivedClass1对应的虚表指针，它指向DerivedClass1的虚表vbtable，另一个vfptr是虚基类表对应的虚指针，它指向vftable。</p>
+<p>然后是两张虚表，第一张表是vbptr指向的表，8表示{vbptr}与{vfptr}的偏移；第二张表是vfptr指向的表，-8指明了这张表所对应的虚指针位于内存的偏移量。</p>
+<p><img src="v3.png" alt=""><br>DerivedClass2与上图相似，同样会有两个虚指针，分别指向两张虚表（第二张是虚基类表）。</p>
+<p><img src="v4.png" alt=""><br>我们来仔细看一下DerivedDerivedClass的内存分布，这里面有三个虚指针了，但base却只有一份。第一张虚表是内含DerivedClass1的，20表示它的虚指针{vbptr}离虚基表指针{vfptr}的距离，第二张虚表是内含DerivedClass2的，12表示它的虚指针{vbptr}离虚基表指针{vfptr}的距离，最后一张表是虚基表，-20指明了它对应的虚指针{vfptr}在内存中的偏移。</p>
+<p>虚继承的作用是减少了对基类的重复，代价是增加了虚表指针的负担（更多的虚表指针）。<br>下面总结一下（当基类有虚函数时）：</p>
+<ol>
+<li><p>每个类都有虚指针和虚表；</p>
+</li>
+<li><p>如果不是虚继承，那么子类将父类的虚指针继承下来，并指向自身的虚表（发生在对象构造时）。有多少个虚函数，虚表里面的项就会有多少。多重继承时，可能存在多个的基类虚表与虚指针；</p>
+</li>
+<li><p>如果是虚继承，那么子类会有两份虚指针，一份指向自己的虚表，另一份指向虚基表，多重继承时虚基表与虚基表指针有且只有一份。</p>
+</li>
+</ol>
+<p>Enjoy!</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;   ​c++虚表指针及虚表是实现多态的关键，因此有必要了解下实现方法。&lt;/p&gt;
+&lt;h3 id=&quot;&quot;&gt;&lt;a href=&quot;#&quot; class=&quot;headerlink&quot; title=&quot;&quot;&gt;&lt;/a&gt;
+    
+    </summary>
+    
+    
+      <category term="c++" scheme="https://ftdejo.github.io/tags/c/"/>
+    
+      <category term="MSVC" scheme="https://ftdejo.github.io/tags/MSVC/"/>
+    
+  </entry>
   
   <entry>
     <title>[LeetCode]Insert Interval插入区间</title>
@@ -74,44 +175,42 @@
   </entry>
   
   <entry>
-    <title>c++函数模板与static</title>
-    <link href="https://ftdejo.github.io/2018/01/21/c-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF%E4%B8%8Estatic/"/>
-    <id>https://ftdejo.github.io/2018/01/21/c-函数模板与static/</id>
-    <published>2018-01-21T02:52:17.000Z</published>
-    <updated>2018-03-21T02:55:48.522Z</updated>
+    <title>c++4种转换</title>
+    <link href="https://ftdejo.github.io/2018/01/21/c-4%E7%A7%8D%E8%BD%AC%E6%8D%A2/"/>
+    <id>https://ftdejo.github.io/2018/01/21/c-4种转换/</id>
+    <published>2018-01-21T03:12:57.000Z</published>
+    <updated>2018-03-21T04:27:55.757Z</updated>
     
-    <content type="html"><![CDATA[<p>一些个人理解</p>
+    <content type="html"><![CDATA[<p>c++相对于c，对于类型转换管理更加方便了，因为提供了4个操作符来管理显示的类型转换：</p>
+<p>static_cast, dynamic_cast,const_cast, reinterpret_cast.</p>
+<p>下面写写对4种转换的理解</p>
 <a id="more"></a>
-<p>首先，明确static关键字的用处：</p>
-<blockquote>
-<p>对于特定类类型的全体成员而言，访问一个全局对象有时是必要的。也许，在程序的任意点需要统计已创建的特定类类型的数量；或者，全局对象可能是指向类的错误处理例程的一个指针；或者，他是指向类类型对象的内存自由储存区的一个指针。            </p>
-<p>然而，全局对象会破坏封装：对象需要支持特定类抽象的实现。如果对象是全局的，一般的用户代码就可以修改这个值。</p>
-<p>通常，非static数据成员存在于类类型的每个对象中。static数据成员独立于该类的任意对象而存在；每个static数据成员是与类关连的对象，并不与该类的对象关联。                           </p>
-<p>  《c++ primer》节选</p>
-</blockquote>
-<p>通俗来说，static解决的问题就好比“共享单车”，放在那里，大家都可以骑。非static成员则是每个人自己的车，放在自己家里，别人一般时候骑不到。</p>
-<p>而函数模板解决了什么呢？</p>
-<blockquote>
-<p>在泛型编程中，我们所编写的类和函数能够动态地用于跨越编译时不相关的类型。一个类火一个函数可以用来操纵多种类型的对象。</p>
-<p>模板是泛型编程的基础，编译器可以用它产生多种特定类型的实例。我们只需编写一次模板，编译器将为使用模板的不同类型实例化模板。</p>
-</blockquote>
-<p>再举个例子（可能不是很恰当）：以后会实现一种标准，通过这种标准制造出来的东西，不管什么汽车、摩托车、自行车···只要考一个驾照，你就可以全都会开了。下面是我随手写的一个类：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>声明非常简单，但是在c++中要注意定义问题：</p>
-<p>首先来看static：<u>必须在类定义的外部定义并且进行初始化。(const例外)</u></p>
-<p>然后模板的定义：抛开分别编译模型不谈(c++11已经抛弃了它··）。也就是说，<u>我们的编译器(包含编译模型)必须看到用到的所有模板的定义。</u>至于怎么看到呢，图方便的话，直接把模板的实现和声明都写在.h中就可以直接搞定。(<del>也可以用#include .cpp写法</del>)</p>
-<p>所以如果是static+模板碰到一起的时候，具体的实现就变成了这样</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">int</span> Vehicle&lt;T&gt;::license(<span class="number">0</span>);</div></pre></td></tr></table></figure>
-<p>怎么样，厉害吧？但是函数模板也没有那么神奇，我们也不可能每次都写出针对所有可能被实例化的类型最适合的模板。这个时候特化就派上例子了。</p>
-<p>还是说刚刚的例子，明显一个驾照在现实生活是行不通的，于是我们要采用特化的方式去定义:</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">int</span> Vehicle&lt;T&gt;::license(<span class="number">0</span>);</div><div class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">int</span> Vechicle&lt;Car&gt;::license(<span class="number">1</span>);</div><div class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">int</span> Vechicle&lt;MotorCycle&gt;::license(<span class="number">2</span>);</div></pre></td></tr></table></figure>
-<p>现在，所有的Car都有了驾照1，所有的MotorCycle有了驾照2。其他的模板的实例化只有一个驾照0。</p>
-<p>再说点什么，模板的本质和宏差不多，就是一系统预定义，不能把它和普通的源文件混淆，所以理所应当的，把他写在头文件里就行了。</p>
+<p>1.const_cast: <strong>去掉</strong>const性质，唯一！也就是说，用其他的都不行。</p>
+<p>2.static_cast 做强迫隐式转换，其实static_cast和其他的转换也有重合，主要是具体的行为不一样。</p>
+<p>static_cast也可以转指针，只是他不会去读取RTTI的资料来验证而已，他会假设你已经有把握了。</p>
+<p>3.dynamic_cast 动态识别指针或引用指向的对象： （安全向下转型）</p>
+<p>涉及到运行时类型检查。如果绑定到引用或指针实际指向的对象不是目标类型，转换失败。返回0（指针），或抛出bad_cast异常（引用）。</p>
+<p>4.reinterpret_cast  位操作转换（依赖编译器行为）一般需要精细控制内存部局的时候就会用到</p>
+<p>  reinterpret_cast很难控制，但不是不能控制。这东西的应用说白了就是void*，有两种使用情景，一是要实现自定义的高性能数据结构的时候使用，二是底层IO。用的时候要注意封装好它产生的值的作用域，不要让不正常的类型的引用四处乱窜。</p>
+<p>下面用一段代码来验证(运行环境x86 直接用的IDE VS2017编译器MSVC)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> A &#123;</div><div class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="built_in">printf</span>(<span class="string">"f1\n"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> B &#123;</div><div class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f2</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="built_in">printf</span>(<span class="string">"f2\n"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> C : <span class="keyword">public</span> A, <span class="keyword">public</span> B</div><div class="line">&#123;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">B* pb = <span class="keyword">new</span> B();</div><div class="line">C* pc = <span class="keyword">static_cast</span>&lt;C*&gt;(pb);</div><div class="line">C* pc_1 = <span class="keyword">reinterpret_cast</span>&lt;C*&gt;(pb);</div><div class="line">C* pc3 = <span class="keyword">dynamic_cast</span>&lt;C*&gt;(pb);</div></pre></td></tr></table></figure>
+<p>首先根据dynamic_cast的定义，pc3肯定为0 ··</p>
+<p>关键就是pc_1和pc转出来的指针区别</p>
+<p>下面给出一次运行结果:</p>
+<p>pc:0066F4D4, pc_1:0066F4D8</p>
+<p>注意到pc_1的地址偏移了吗？</p>
+<p>也就是说reinterpret_cast的转换由于比较底层，他不会去验证pb，直接一个强行的地址转换，就让pc_1指向原来pb指向的地址了。而static_cast就比较有意思了，他会自己把指针偏移，这样让转出来的指针看起来和一般指针一样(但此时指向的C对象中的A对象并没有初始化)</p>
+<p>下面附个图吧。</p>
+<p><img src="pic1.png" alt=""></p>
+<p>所以接下来这段代码也就不难理解了</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">pc-&gt;f1();<span class="comment">//报错</span></div><div class="line">pc-&gt;f2();<span class="comment">//输出f2</span></div><div class="line">pc_1-&gt;f1();<span class="comment">//输出f2</span></div><div class="line">pc_1-&gt;f2();<span class="comment">//报错</span></div></pre></td></tr></table></figure>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;一些个人理解&lt;/p&gt;
+      &lt;p&gt;c++相对于c，对于类型转换管理更加方便了，因为提供了4个操作符来管理显示的类型转换：&lt;/p&gt;
+&lt;p&gt;static_cast, dynamic_cast,const_cast, reinterpret_cast.&lt;/p&gt;
+&lt;p&gt;下面写写对4种转换的理解&lt;/p&gt;
     
     </summary>
     
@@ -223,42 +322,44 @@
   </entry>
   
   <entry>
-    <title>c++4种转换</title>
-    <link href="https://ftdejo.github.io/2017/11/21/c-4%E7%A7%8D%E8%BD%AC%E6%8D%A2/"/>
-    <id>https://ftdejo.github.io/2017/11/21/c-4种转换/</id>
-    <published>2017-11-21T03:12:57.000Z</published>
-    <updated>2018-03-21T04:26:20.636Z</updated>
+    <title>c++函数模板与static</title>
+    <link href="https://ftdejo.github.io/2017/11/21/c-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF%E4%B8%8Estatic/"/>
+    <id>https://ftdejo.github.io/2017/11/21/c-函数模板与static/</id>
+    <published>2017-11-21T02:52:17.000Z</published>
+    <updated>2018-03-21T04:28:06.402Z</updated>
     
-    <content type="html"><![CDATA[<p>c++相对于c，对于类型转换管理更加方便了，因为提供了4个操作符来管理显示的类型转换：</p>
-<p>static_cast, dynamic_cast,const_cast, reinterpret_cast.</p>
-<p>下面写写对4种转换的理解</p>
+    <content type="html"><![CDATA[<p>一些个人理解</p>
 <a id="more"></a>
-<p>1.const_cast: <strong>去掉</strong>const性质，唯一！也就是说，用其他的都不行。</p>
-<p>2.static_cast 做强迫隐式转换，其实static_cast和其他的转换也有重合，主要是具体的行为不一样。</p>
-<p>static_cast也可以转指针，只是他不会去读取RTTI的资料来验证而已，他会假设你已经有把握了。</p>
-<p>3.dynamic_cast 动态识别指针或引用指向的对象： （安全向下转型）</p>
-<p>涉及到运行时类型检查。如果绑定到引用或指针实际指向的对象不是目标类型，转换失败。返回0（指针），或抛出bad_cast异常（引用）。</p>
-<p>4.reinterpret_cast  位操作转换（依赖编译器行为）一般需要精细控制内存部局的时候就会用到</p>
-<p>  reinterpret_cast很难控制，但不是不能控制。这东西的应用说白了就是void*，有两种使用情景，一是要实现自定义的高性能数据结构的时候使用，二是底层IO。用的时候要注意封装好它产生的值的作用域，不要让不正常的类型的引用四处乱窜。</p>
-<p>下面用一段代码来验证(运行环境x86 直接用的IDE VS2017编译器MSVC)</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> A &#123;</div><div class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="built_in">printf</span>(<span class="string">"f1\n"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> B &#123;</div><div class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f2</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="built_in">printf</span>(<span class="string">"f2\n"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> C : <span class="keyword">public</span> A, <span class="keyword">public</span> B</div><div class="line">&#123;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">B* pb = <span class="keyword">new</span> B();</div><div class="line">C* pc = <span class="keyword">static_cast</span>&lt;C*&gt;(pb);</div><div class="line">C* pc_1 = <span class="keyword">reinterpret_cast</span>&lt;C*&gt;(pb);</div><div class="line">C* pc3 = <span class="keyword">dynamic_cast</span>&lt;C*&gt;(pb);</div></pre></td></tr></table></figure>
-<p>首先根据dynamic_cast的定义，pc3肯定为0 ··</p>
-<p>关键就是pc_1和pc转出来的指针区别</p>
-<p>下面给出一次运行结果:</p>
-<p>pc:0066F4D4, pc_1:0066F4D8</p>
-<p>注意到pc_1的地址偏移了吗？</p>
-<p>也就是说reinterpret_cast的转换由于比较底层，他不会去验证pb，直接一个强行的地址转换，就让pc_1指向原来pb指向的地址了。而static_cast就比较有意思了，他会自己把指针偏移，这样让转出来的指针看起来和一般指针一样(但此时指向的C对象中的A对象并没有初始化)</p>
-<p>下面附个图吧。</p>
-<p><img src="pic1.png" alt=""></p>
-<p>所以接下来这段代码也就不难理解了</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">pc-&gt;f1();<span class="comment">//报错</span></div><div class="line">pc-&gt;f2();<span class="comment">//输出f2</span></div><div class="line">pc_1-&gt;f1();<span class="comment">//输出f2</span></div><div class="line">pc_1-&gt;f2();<span class="comment">//报错</span></div></pre></td></tr></table></figure>
+<p>首先，明确static关键字的用处：</p>
+<blockquote>
+<p>对于特定类类型的全体成员而言，访问一个全局对象有时是必要的。也许，在程序的任意点需要统计已创建的特定类类型的数量；或者，全局对象可能是指向类的错误处理例程的一个指针；或者，他是指向类类型对象的内存自由储存区的一个指针。            </p>
+<p>然而，全局对象会破坏封装：对象需要支持特定类抽象的实现。如果对象是全局的，一般的用户代码就可以修改这个值。</p>
+<p>通常，非static数据成员存在于类类型的每个对象中。static数据成员独立于该类的任意对象而存在；每个static数据成员是与类关连的对象，并不与该类的对象关联。                           </p>
+<p>  《c++ primer》节选</p>
+</blockquote>
+<p>通俗来说，static解决的问题就好比“共享单车”，放在那里，大家都可以骑。非static成员则是每个人自己的车，放在自己家里，别人一般时候骑不到。</p>
+<p>而函数模板解决了什么呢？</p>
+<blockquote>
+<p>在泛型编程中，我们所编写的类和函数能够动态地用于跨越编译时不相关的类型。一个类火一个函数可以用来操纵多种类型的对象。</p>
+<p>模板是泛型编程的基础，编译器可以用它产生多种特定类型的实例。我们只需编写一次模板，编译器将为使用模板的不同类型实例化模板。</p>
+</blockquote>
+<p>再举个例子（可能不是很恰当）：以后会实现一种标准，通过这种标准制造出来的东西，不管什么汽车、摩托车、自行车···只要考一个驾照，你就可以全都会开了。下面是我随手写的一个类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>声明非常简单，但是在c++中要注意定义问题：</p>
+<p>首先来看static：<u>必须在类定义的外部定义并且进行初始化。(const例外)</u></p>
+<p>然后模板的定义：抛开分别编译模型不谈(c++11已经抛弃了它··）。也就是说，<u>我们的编译器(包含编译模型)必须看到用到的所有模板的定义。</u>至于怎么看到呢，图方便的话，直接把模板的实现和声明都写在.h中就可以直接搞定。(<del>也可以用#include .cpp写法</del>)</p>
+<p>所以如果是static+模板碰到一起的时候，具体的实现就变成了这样</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">int</span> Vehicle&lt;T&gt;::license(<span class="number">0</span>);</div></pre></td></tr></table></figure>
+<p>怎么样，厉害吧？但是函数模板也没有那么神奇，我们也不可能每次都写出针对所有可能被实例化的类型最适合的模板。这个时候特化就派上例子了。</p>
+<p>还是说刚刚的例子，明显一个驾照在现实生活是行不通的，于是我们要采用特化的方式去定义:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">int</span> Vehicle&lt;T&gt;::license(<span class="number">0</span>);</div><div class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">int</span> Vechicle&lt;Car&gt;::license(<span class="number">1</span>);</div><div class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">int</span> Vechicle&lt;MotorCycle&gt;::license(<span class="number">2</span>);</div></pre></td></tr></table></figure>
+<p>现在，所有的Car都有了驾照1，所有的MotorCycle有了驾照2。其他的模板的实例化只有一个驾照0。</p>
+<p>再说点什么，模板的本质和宏差不多，就是一系统预定义，不能把它和普通的源文件混淆，所以理所应当的，把他写在头文件里就行了。</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;c++相对于c，对于类型转换管理更加方便了，因为提供了4个操作符来管理显示的类型转换：&lt;/p&gt;
-&lt;p&gt;static_cast, dynamic_cast,const_cast, reinterpret_cast.&lt;/p&gt;
-&lt;p&gt;下面写写对4种转换的理解&lt;/p&gt;
+      &lt;p&gt;一些个人理解&lt;/p&gt;
     
     </summary>
     

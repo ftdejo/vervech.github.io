@@ -1,0 +1,772 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="c++,MSVC," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="陈六的博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="​c++虚表指针及虚表是实现多态的关键，因此有必要了解下实现方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++虚函数相关">
+<meta property="og:url" content="https://ftdejo.github.io/2018/02/21/c-虚函数相关/index.html">
+<meta property="og:site_name" content="陈六的博客">
+<meta property="og:description" content="​c++虚表指针及虚表是实现多态的关键，因此有必要了解下实现方法。">
+<meta property="og:image" content="https://ftdejo.github.io/pic2.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic1.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic3.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic4.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic5.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic6.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic7.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic8.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic85.png">
+<meta property="og:image" content="https://ftdejo.github.io/pic9.png">
+<meta property="og:image" content="https://ftdejo.github.io/v1.png">
+<meta property="og:image" content="https://ftdejo.github.io/v2.png">
+<meta property="og:image" content="https://ftdejo.github.io/v3.png">
+<meta property="og:image" content="https://ftdejo.github.io/v4.png">
+<meta property="og:updated_time" content="2018-03-21T12:15:29.906Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++虚函数相关">
+<meta name="twitter:description" content="​c++虚表指针及虚表是实现多态的关键，因此有必要了解下实现方法。">
+<meta name="twitter:image" content="https://ftdejo.github.io/pic2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://ftdejo.github.io/2018/02/21/c-虚函数相关/"/>
+
+
+
+
+
+  <title> C++虚函数相关 | 陈六的博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">陈六的博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">memo for code or game.</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="https://ftdejo.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="https://ftdejo.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="https://ftdejo.github.io/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      <!--这里插入个人js -->
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://ftdejo.github.io/2018/02/21/c-虚函数相关/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="陈六">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/images/avatar.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="陈六的博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="陈六的博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                C++虚函数相关
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-21T12:33:56+08:00">
+                2018-02-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/21/c-虚函数相关/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/02/21/c-虚函数相关/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>   ​c++虚表指针及虚表是实现多态的关键，因此有必要了解下实现方法。</p>
+<h3 id=""><a href="#" class="headerlink" title=""></a><a id="more"></a></h3><p>(本文运行环境为VS2017 编译器MSVC)</p>
+<p>在Visual Studio里，可以利用reportAllClassLayout查看内存。具体实现如下：</p>
+<p><img src="pic2.png" alt=""><br><img src="pic1.png" alt=""></p>
+<h3 id="普通类"><a href="#普通类" class="headerlink" title="普通类:"></a>普通类:</h3><p>接下来就可以愉快的敲代码了，首先定义一个类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> a;</div><div class="line">    <span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Function</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>然后编译，可以看到有如下的排布：</p>
+<p><img src="pic3.png" alt=""></p>
+<p>因为这里要去除内存对齐的因素，所以我都用了int型，从这里可以看到普通类的排布方式，成员变量依据声明的顺序进行排列（类内偏移为0开始），成员函数不占内存空间。</p>
+<h3 id="继承类"><a href="#继承类" class="headerlink" title="继承类:"></a>继承类:</h3><p>然后定义一个继承类</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> DerivedClass: <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">DerivedFunction</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>然后编译下：</p>
+<p><img src="pic4.png" alt=""></p>
+<p>可以看到子类继承了父类的成员变量，在内存排布上，先是排布了父类的成员变量，接着排布子类的成员变量，同样，成员函数不占字节。</p>
+<h3 id="虚函数-无覆盖-一般继承"><a href="#虚函数-无覆盖-一般继承" class="headerlink" title="虚函数(无覆盖 一般继承):"></a>虚函数(无覆盖 一般继承):</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Function</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> DerivedClass : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction1</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这里我加上了一个虚函数，先看下基类内存分布：</p>
+<p><img src="pic5.png" alt=""></p>
+<p>这个内存结构图分成了两个部分，上面是内存分布，下面是虚表，我们逐个看。MSVC是把虚表指针放在了内存的开始处（0地址偏移），然后再是成员变量；下面生成了虚表，紧跟在&amp;Base_meta后面的0表示，这张虚表对应的虚指针在内存中的分布，下面列出了虚函数，左侧的0是这个虚函数的序号，这里只有一个虚函数，所以只有一项，如果有多个虚函数，会有序号为1，为2的虚函数列出来。注意这里的只是虚表里面增加，虚函数指针只有一个。</p>
+<p>然后我给子类加上了个额外的虚函数，但是没有覆盖父类的。再来看子类内存排布：</p>
+<p><img src="pic6.png" alt=""></p>
+<p>上半部是内存分布，可以看到，虚表指针被继承了，且仍位于内存排布的起始处，下面是父类的成员变量a和b，最后是子类的成员变量c，注意虚表指针只有一个，子类并没有再生成虚表指针了。从以上内存分布，可以看出：</p>
+<ol>
+<li>虚函数按照其声明顺序放于表中。</li>
+<li>父类的虚函数在子类的虚函数前面。</li>
+</ol>
+<h3 id="虚函数-覆盖-一般继承"><a href="#虚函数-覆盖-一般继承" class="headerlink" title="虚函数(覆盖 一般继承):"></a>虚函数(覆盖 一般继承):</h3><p>如果不覆盖，那么我们多态就无从谈起，于是这里我修改了下子类代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Function</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction2</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> DerivedClass : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">VirtualFunction3</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>重新编译程序，可以看到以下内存分布:</p>
+<p><img src="pic7.png" alt=""></p>
+<p>可以发现，Base::VirtualFunction在虚表中不见了，那么总结出：</p>
+<ol>
+<li>覆盖的f()函数被放到了虚表中原来父类虚函数的位置。</li>
+<li>没有被覆盖的函数依旧。</li>
+</ol>
+<h3 id="多态"><a href="#多态" class="headerlink" title="多态!"></a>多态!</h3><p>那么编译器是如何利用虚表指针与虚表来实现多态的呢？是这样的，当创建一个含有虚函数的父类的对象时，编译器在对象构造时将虚表指针指向父类的虚函数；同样，当创建子类的对象时，编译器在构造函数里将虚表指针（子类只有一个虚表指针，它来自父类）指向子类的虚表（这个虚表里面的虚函数入口地址是子类的）。</p>
+<p>所以，对于这样一段代码<code>Base *p = new Derived()</code>:</p>
+<p>生成的是子类的对象，在构造时，子类对象的虚指针指向的是子类的虚表，接着由<code>Derived*</code>到<code>Base*</code>的转换并没有改变虚表指针，所以这时候<code>p-&gt;VirtualFunction</code>， 由p所指的内存中的虚函数表的<code>VirtualFunction()</code>的位置已经被<code>Derive::VirtualFunction()</code>函数地址所取代，于是在实际调用发生时，是<code>Derive::VirtualFunction()</code>被调用了。这就实现了多态。</p>
+<h3 id="多重继承-无覆盖"><a href="#多重继承-无覆盖" class="headerlink" title="多重继承(无覆盖)"></a>多重继承(无覆盖)</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">CommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass1 : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f1</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass2 : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> d;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f2</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedDerivedClass : <span class="keyword">public</span> DerivedClass1, <span class="keyword">public</span> DerivedClass2</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> e;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedDerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f3</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>内存分布图(前三个省略)：</p>
+<p><img src="pic8.png" alt=""></p>
+<p>下面我们重点看看这个类DerivedDerivedClass，由外向内看，它并列地排布着继承而来的两个父类DerivedClass1与DerivedClass2，还有自身的成员变量e。DerivedClass1包含了它的成员变量c，以及Base，Base有一个0地址偏移的虚表指针，然后是成员变量a和b；DerivedClass2的内存排布类似于DerivedClass1，偏移量为16(即，注意到DerivedClass2里面竟然也有一份Base。</p>
+<p>可以看到:</p>
+<ol>
+<li>每个父类都有自己的虚表</li>
+<li>存了2个虚表指针，来指向不同的父类虚表</li>
+<li>子类的虚函数被放到了第一个父类的表中。（所谓的第一个父类是按照声明顺序来判断的）</li>
+</ol>
+<p>这样做就是为了解决不同的父类类型的指针指向同一个子类实例，而能够调用到实际的函数。</p>
+<h3 id="多重继承-有覆盖"><a href="#多重继承-有覆盖" class="headerlink" title="多重继承(有覆盖)"></a>多重继承(有覆盖)</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">CommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">g</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass1 : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">g1</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass2 : <span class="keyword">public</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> d;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">g2</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedDerivedClass : <span class="keyword">public</span> DerivedClass1, <span class="keyword">public</span> DerivedClass2</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> e;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedDerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">g3</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p><img src="pic85.png" alt=""></p>
+<p><img src="pic9.png" alt=""></p>
+<p>我们可以看见，<strong>两个</strong>父类虚函数表中的f()的位置被替换成了子类的函数指针。这样，我们就可以任一静态类型的父类来指向子类，并调用子类的f()了。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">DerivedDerivedClass d;</div><div class="line">DerivedClass1 *b2 = &amp;d;</div><div class="line">DerivedClass2 *b3 = &amp;d;</div><div class="line">b2-&gt;f(); <span class="comment">//DerivedDerivedClass::f()</span></div><div class="line">b3-&gt;f(); <span class="comment">//DerivedDerivedClass::f()</span></div></pre></td></tr></table></figure>
+<h3 id="虚继承"><a href="#虚继承" class="headerlink" title="虚继承"></a>虚继承</h3><p>不知道看官注意到了没，在上文中，我没有写<code>Base b = &amp;d; b-&gt;f();</code></p>
+<p>这样的代码为什么出问题，如果是从上文阅读过来，我想这个问题一定难不倒你:)</p>
+<p>关键是怎么解决呢？那么可以利用虚继承的概念。</p>
+<blockquote>
+<p>在虚继承下，对给定虚基类，无论该类在派生层次中作为虚基类出现多少次，只继承一个共享的基类子对象。共享的基类子对象称为虚基类。   <em>《c++ primer》</em>                           </p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> a;</div><div class="line">	<span class="keyword">int</span> b;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">CommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass1 : <span class="keyword">public</span> <span class="keyword">virtual</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> c;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedClass2 : <span class="keyword">public</span> <span class="keyword">virtual</span> Base</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> d;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> DerivedDerivedClass : <span class="keyword">public</span> DerivedClass1, <span class="keyword">public</span> DerivedClass2</div><div class="line">&#123;</div><div class="line">	<span class="keyword">int</span> e;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">DerivedDerivedCommonFunction</span><span class="params">()</span></span>;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="keyword">virtual</span> <span class="title">f</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>编译上述代码：</p>
+<p><img src="v1.png" alt=""></p>
+<p>Base没有变化。但是只要我们往下，就会发现很多不同的东西：</p>
+<p><img src="v2.png" alt=""></p>
+<p>DerivedClass1就已经有变化了，原来是先排虚表指针与Base成员变量，vfptr位于0地址偏移处；但现在有两个虚表指针了，一个是vbptr，另一个是vfptr。vbptr是这个DerivedClass1对应的虚表指针，它指向DerivedClass1的虚表vbtable，另一个vfptr是虚基类表对应的虚指针，它指向vftable。</p>
+<p>然后是两张虚表，第一张表是vbptr指向的表，8表示{vbptr}与{vfptr}的偏移；第二张表是vfptr指向的表，-8指明了这张表所对应的虚指针位于内存的偏移量。</p>
+<p><img src="v3.png" alt=""><br>DerivedClass2与上图相似，同样会有两个虚指针，分别指向两张虚表（第二张是虚基类表）。</p>
+<p><img src="v4.png" alt=""><br>我们来仔细看一下DerivedDerivedClass的内存分布，这里面有三个虚指针了，但base却只有一份。第一张虚表是内含DerivedClass1的，20表示它的虚指针{vbptr}离虚基表指针{vfptr}的距离，第二张虚表是内含DerivedClass2的，12表示它的虚指针{vbptr}离虚基表指针{vfptr}的距离，最后一张表是虚基表，-20指明了它对应的虚指针{vfptr}在内存中的偏移。</p>
+<p>虚继承的作用是减少了对基类的重复，代价是增加了虚表指针的负担（更多的虚表指针）。<br>下面总结一下（当基类有虚函数时）：</p>
+<ol>
+<li><p>每个类都有虚指针和虚表；</p>
+</li>
+<li><p>如果不是虚继承，那么子类将父类的虚指针继承下来，并指向自身的虚表（发生在对象构造时）。有多少个虚函数，虚表里面的项就会有多少。多重继承时，可能存在多个的基类虚表与虚指针；</p>
+</li>
+<li><p>如果是虚继承，那么子类会有两份虚指针，一份指向自己的虚表，另一份指向虚基表，多重继承时虚基表与虚基表指针有且只有一份。</p>
+</li>
+</ol>
+<p>Enjoy!</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/c/" rel="tag"># c++</a>
+          
+            <a href="/tags/MSVC/" rel="tag"># MSVC</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/25/LeetCode-Insert-Interval插入区间/" rel="next" title="[LeetCode]Insert Interval插入区间">
+                <i class="fa fa-chevron-left"></i> [LeetCode]Insert Interval插入区间
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/02/21/c-虚函数相关/"
+           data-title="C++虚函数相关" data-url="https://ftdejo.github.io/2018/02/21/c-虚函数相关/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/images/avatar.jpg"
+               alt="陈六" />
+          <p class="site-author-name" itemprop="name">陈六</p>
+          <p class="site-description motion-element" itemprop="description">Why so serious?</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="https://ftdejo.github.io/archives/">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="https://ftdejo.github.io/tags/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#普通类"><span class="nav-number">2.</span> <span class="nav-text">普通类:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#继承类"><span class="nav-number">3.</span> <span class="nav-text">继承类:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚函数-无覆盖-一般继承"><span class="nav-number">4.</span> <span class="nav-text">虚函数(无覆盖 一般继承):</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚函数-覆盖-一般继承"><span class="nav-number">5.</span> <span class="nav-text">虚函数(覆盖 一般继承):</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多态"><span class="nav-number">6.</span> <span class="nav-text">多态!</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多重继承-无覆盖"><span class="nav-number">7.</span> <span class="nav-text">多重继承(无覆盖)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多重继承-有覆盖"><span class="nav-number">8.</span> <span class="nav-text">多重继承(有覆盖)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚继承"><span class="nav-number">9.</span> <span class="nav-text">虚继承</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">陈六</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"vervech"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
