@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://ftdejo.github.io/"/>
-  <updated>2018-03-21T12:15:29.906Z</updated>
+  <updated>2018-03-21T12:20:47.450Z</updated>
   <id>https://ftdejo.github.io/</id>
   
   <author>
@@ -20,10 +20,11 @@
     <link href="https://ftdejo.github.io/2018/02/21/c-%E8%99%9A%E5%87%BD%E6%95%B0%E7%9B%B8%E5%85%B3/"/>
     <id>https://ftdejo.github.io/2018/02/21/c-虚函数相关/</id>
     <published>2018-02-21T04:33:56.000Z</published>
-    <updated>2018-03-21T12:15:29.906Z</updated>
+    <updated>2018-03-21T12:20:47.450Z</updated>
     
     <content type="html"><![CDATA[<p>   ​c++虚表指针及虚表是实现多态的关键，因此有必要了解下实现方法。</p>
-<h3 id=""><a href="#" class="headerlink" title=""></a><a id="more"></a></h3><p>(本文运行环境为VS2017 编译器MSVC)</p>
+<a id="more"></a>
+<p>(本文运行环境为VS2017 编译器MSVC)</p>
 <p>在Visual Studio里，可以利用reportAllClassLayout查看内存。具体实现如下：</p>
 <p><img src="pic2.png" alt=""><br><img src="pic1.png" alt=""></p>
 <h3 id="普通类"><a href="#普通类" class="headerlink" title="普通类:"></a>普通类:</h3><p>接下来就可以愉快的敲代码了，首先定义一个类：</p>
@@ -105,7 +106,6 @@
     <summary type="html">
     
       &lt;p&gt;   ​c++虚表指针及虚表是实现多态的关键，因此有必要了解下实现方法。&lt;/p&gt;
-&lt;h3 id=&quot;&quot;&gt;&lt;a href=&quot;#&quot; class=&quot;headerlink&quot; title=&quot;&quot;&gt;&lt;/a&gt;
     
     </summary>
     
