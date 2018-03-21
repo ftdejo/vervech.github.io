@@ -74,6 +74,53 @@
   </entry>
   
   <entry>
+    <title>c++函数模板与static</title>
+    <link href="https://ftdejo.github.io/2018/01/21/c-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF%E4%B8%8Estatic/"/>
+    <id>https://ftdejo.github.io/2018/01/21/c-函数模板与static/</id>
+    <published>2018-01-21T02:52:17.000Z</published>
+    <updated>2018-03-21T02:55:48.522Z</updated>
+    
+    <content type="html"><![CDATA[<p>一些个人理解</p>
+<a id="more"></a>
+<p>首先，明确static关键字的用处：</p>
+<blockquote>
+<p>对于特定类类型的全体成员而言，访问一个全局对象有时是必要的。也许，在程序的任意点需要统计已创建的特定类类型的数量；或者，全局对象可能是指向类的错误处理例程的一个指针；或者，他是指向类类型对象的内存自由储存区的一个指针。            </p>
+<p>然而，全局对象会破坏封装：对象需要支持特定类抽象的实现。如果对象是全局的，一般的用户代码就可以修改这个值。</p>
+<p>通常，非static数据成员存在于类类型的每个对象中。static数据成员独立于该类的任意对象而存在；每个static数据成员是与类关连的对象，并不与该类的对象关联。                           </p>
+<p>  《c++ primer》节选</p>
+</blockquote>
+<p>通俗来说，static解决的问题就好比“共享单车”，放在那里，大家都可以骑。非static成员则是每个人自己的车，放在自己家里，别人一般时候骑不到。</p>
+<p>而函数模板解决了什么呢？</p>
+<blockquote>
+<p>在泛型编程中，我们所编写的类和函数能够动态地用于跨越编译时不相关的类型。一个类火一个函数可以用来操纵多种类型的对象。</p>
+<p>模板是泛型编程的基础，编译器可以用它产生多种特定类型的实例。我们只需编写一次模板，编译器将为使用模板的不同类型实例化模板。</p>
+</blockquote>
+<p>再举个例子（可能不是很恰当）：以后会实现一种标准，通过这种标准制造出来的东西，不管什么汽车、摩托车、自行车···只要考一个驾照，你就可以全都会开了。下面是我随手写的一个类：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>声明非常简单，但是在c++中要注意定义问题：</p>
+<p>首先来看static：<u>必须在类定义的外部定义并且进行初始化。(const例外)</u></p>
+<p>然后模板的定义：抛开分别编译模型不谈(c++11已经抛弃了它··）。也就是说，<u>我们的编译器(包含编译模型)必须看到用到的所有模板的定义。</u>至于怎么看到呢，图方便的话，直接把模板的实现和声明都写在.h中就可以直接搞定。(<del>也可以用#include .cpp写法</del>)</p>
+<p>所以如果是static+模板碰到一起的时候，具体的实现就变成了这样</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">int</span> Vehicle&lt;T&gt;::license(<span class="number">0</span>);</div></pre></td></tr></table></figure>
+<p>怎么样，厉害吧？但是函数模板也没有那么神奇，我们也不可能每次都写出针对所有可能被实例化的类型最适合的模板。这个时候特化就派上例子了。</p>
+<p>还是说刚刚的例子，明显一个驾照在现实生活是行不通的，于是我们要采用特化的方式去定义:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">class</span> Vehicle&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> license;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">int</span> Vehicle&lt;T&gt;::license(<span class="number">0</span>);</div><div class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">int</span> Vechicle&lt;Car&gt;::license(<span class="number">1</span>);</div><div class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">int</span> Vechicle&lt;MotorCycle&gt;::license(<span class="number">2</span>);</div></pre></td></tr></table></figure>
+<p>现在，所有的Car都有了驾照1，所有的MotorCycle有了驾照2。其他的模板的实例化只有一个驾照0。</p>
+<p>再说点什么，模板的本质和宏差不多，就是一系统预定义，不能把它和普通的源文件混淆，所以理所应当的，把他写在头文件里就行了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;一些个人理解&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="c++" scheme="https://ftdejo.github.io/tags/c/"/>
+    
+  </entry>
+  
+  <entry>
     <title>[LeetCode] Search in Rotated Sorted Array搜索旋转排序数组</title>
     <link href="https://ftdejo.github.io/2017/12/21/%E6%90%9C%E7%B4%A2%E6%97%8B%E8%BD%AC%E6%8E%92%E5%BA%8F%E6%95%B0%E7%BB%84/"/>
     <id>https://ftdejo.github.io/2017/12/21/搜索旋转排序数组/</id>
@@ -164,6 +211,52 @@
 &lt;p&gt;(i.e., &lt;code&gt;0 1 2 4 5 6 7&lt;/code&gt; might become &lt;code&gt;4 5 6 7 0 1 2&lt;/code&gt;).&lt;/p&gt;
 &lt;p&gt;You are given a target value to search. If found in the array return its index, otherwise return -1.&lt;/p&gt;
 &lt;p&gt;You may assume no duplicate exists in the array.&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="算法" scheme="https://ftdejo.github.io/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="leetcode" scheme="https://ftdejo.github.io/tags/leetcode/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>leetcode edit distance</title>
+    <link href="https://ftdejo.github.io/2017/06/21/leetcode-edit-distance/"/>
+    <id>https://ftdejo.github.io/2017/06/21/leetcode-edit-distance/</id>
+    <published>2017-06-21T02:40:45.000Z</published>
+    <updated>2018-03-21T02:46:24.215Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>Given two words <em>word1</em> and <em>word2</em>, find the minimum number of steps required to convert <em>word1</em> to <em>word2</em>. (each operation is counted as 1 step.)</p>
+<p>You have the following 3 operations permitted on a word:</p>
+<p>a) Insert a character<br>b) Delete a character<br>c) Replace a character</p>
+</blockquote>
+<a id="more"></a>
+<p>先读题，给定word1和word2，求将word1转化为word2需要的”步数”。其中每一步可以是 增、减、替换中的一个操作。</p>
+<p>这道题我开始想到的是LCS(最大公共子序列)的思路。即求出LCS，然后再分情况求出step。后来写lcs的时候发现，这道题本身用一个dp思路就可以解决。其实leetcode上挺多hard的题都是写一个dp就解决的··并不hard··</p>
+<p>解法和LCS的解法非常相像：</p>
+<p>用一个<code>dp[i+1][j+1]</code>二维数组来代表转换所需的步数。</p>
+<p>首先看边界情况，<code>dp[i][0]</code>与<code>dp[0][j]</code>代表的意义是将一个字符串转换为长度为0(即空串)或者将空串转换为一个字符串。前者需要i次删除，后者需要j次插入。所以：<code>dp[i][0] = i</code> <code>dp[0][j] = j</code></p>
+<p>然后再考虑通项：</p>
+<p>要求<code>dp[i][j]</code>即要将字符串<code>word1[0..i - 1]</code>转换为<code>word2[0..j - 1]</code>，如果<code>word[i-1]</code>与<code>word2[j-1]</code>相等，那么所需的步数与将字符串<code>word1[0..i - 2]</code>转换为<code>word2[0..j - 2]</code>相同，即<code>dp[i][j] = dp[i - 1][j - 1]</code></p>
+<p>当不相等的时候，我们可以有3种操作完成转换：</p>
+<p>1.替换：将字符串<code>word1[0..i - 2]</code>转换为<code>word2[0..j - 2]</code>，然后把<code>word1[i - 1]</code>替换为<code>word2[j - 1]</code> 那么<code>dp[i][j] = dp[i - 1][j - 1] + 1</code>；</p>
+<p>2.插入：将字符串<code>word1[0..i - 1]</code>转换为<code>word2[0..j - 2]</code> ，然后在<code>word2[0..j-2]</code>最后插入<code>word2[j - 1]</code>那么<code>dp[i][i] = dp[i][j - 1] + 1</code> ；</p>
+<p>3.删除：把<code>word1[0..i-1]</code>最后一位删除，然后将字符串<code>word1[0..i - 2</code>转换为<code>word2[0..j - 1]</code> 那么<code>dp[i][i] = dp[i - 1][j] + 1</code> 。</p>
+<p>通过自底而上生成来完成，返回<code>dp[n1][n2]</code>即为答案。</p>
+<h2 id="Code1"><a href="#Code1" class="headerlink" title="Code1:"></a>Code1:</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">minDistance</span><span class="params">(<span class="built_in">string</span> word1, <span class="built_in">string</span> word2)</span> </span>&#123;</div><div class="line">  <span class="keyword">int</span> n1 = word1.size(), n2 = word2.size();</div><div class="line">  <span class="keyword">int</span> tmp[n1 + <span class="number">1</span>][n2 + <span class="number">1</span>];</div><div class="line">  tmp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</div><div class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n1 + <span class="number">1</span>; ++i) </div><div class="line">      tmp[i][<span class="number">0</span>] = i;</div><div class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; n2 + <span class="number">1</span>; ++j)</div><div class="line">      tmp[<span class="number">0</span>][j] = j;</div><div class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n1 + <span class="number">1</span>; ++i)</div><div class="line">      <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; n2 + <span class="number">1</span>; ++j)&#123;</div><div class="line">          <span class="keyword">if</span>(word1[i - <span class="number">1</span>] == word2[j - <span class="number">1</span>]) &#123;</div><div class="line">              tmp[i][j] = tmp[i - <span class="number">1</span>][j - <span class="number">1</span>];</div><div class="line">          &#125;<span class="keyword">else</span></div><div class="line">              tmp[i][j] = min(tmp[i - <span class="number">1</span>][j - <span class="number">1</span>], min(tmp[i - <span class="number">1</span>][j], tmp[i][j - <span class="number">1</span>])) + <span class="number">1</span>;</div><div class="line">      &#125;</div><div class="line">  <span class="keyword">return</span> tmp[n1][n2];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后考虑优化，参照LCS的优化方法，整个<code>n1 * n2</code>的矩阵浪费了空间，因为每次计算只需要前三项，所以只需一个一维数组就行。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;Given two words &lt;em&gt;word1&lt;/em&gt; and &lt;em&gt;word2&lt;/em&gt;, find the minimum number of steps required to convert &lt;em&gt;word1&lt;/em&gt; to &lt;em&gt;word2&lt;/em&gt;. (each operation is counted as 1 step.)&lt;/p&gt;
+&lt;p&gt;You have the following 3 operations permitted on a word:&lt;/p&gt;
+&lt;p&gt;a) Insert a character&lt;br&gt;b) Delete a character&lt;br&gt;c) Replace a character&lt;/p&gt;
 &lt;/blockquote&gt;
     
     </summary>
